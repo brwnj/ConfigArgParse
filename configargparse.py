@@ -56,8 +56,8 @@ def getArgumentParser(name=None, **kwargs):
 
 
 
-class ArgumentDefaultsRawHelpFormatter(    
-    argparse.ArgumentDefaultsHelpFormatter, 
+class ArgumentDefaultsRawHelpFormatter(
+    argparse.ArgumentDefaultsHelpFormatter,
     argparse.RawTextHelpFormatter,
     argparse.RawDescriptionHelpFormatter):
     """HelpFormatter that adds default values AND doesn't do line-wrapping"""
@@ -515,8 +515,8 @@ class ArgumentParser(argparse.ArgumentParser):
 
 
     def _open_config_files(self, command_line_args):
-        """Tries to parse config file path(s) from within command_line_args. 
-        Returns a list of opened config files, including files specified on the 
+        """Tries to parse config file path(s) from within command_line_args.
+        Returns a list of opened config files, including files specified on the
         commandline as well as any default_config_files specified in the
         constructor that are present on disk.
 
@@ -548,13 +548,13 @@ class ArgumentParser(argparse.ArgumentParser):
             arg_parser._add_action(action)
 
             # make parser not exit on error by replacing its error method.
-            # Otherwise it sys.exits(..) if, for example, config file 
+            # Otherwise it sys.exits(..) if, for example, config file
             # is_required=True and user doesn't provide it.
             def error_method(self, message):
                 pass
             arg_parser.error = types.MethodType(error_method, arg_parser)
 
-            # check whether the user provided a value 
+            # check whether the user provided a value
             parsed_arg = arg_parser.parse_known_args(args=command_line_args)
             if not parsed_arg:
                 continue
@@ -665,7 +665,11 @@ class ArgumentParser(argparse.ArgumentParser):
                 "commandline values override %s.") % (
                 " which override ".join(value_sources))
         if msg:
-            self.description = (self.description or "") + " " + msg
+            if self.epilog:
+                sep = "\n" if self.epilog.endswith("\n") else " "
+                self.epilog = self.epilog + sep + msg
+            else:
+                self.epilog = msg
 
         return argparse.ArgumentParser.format_help(self)
 
